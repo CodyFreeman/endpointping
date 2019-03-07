@@ -138,7 +138,10 @@ func validateFlags(help bool, endpointListPath string, outputFilePath string) {
 func writeOutput(collection UrlStatusCollection, outputFile string) {
 	fh, err := os.Create(outputFile)
 	eHandler(err, "Could not create output file")
-	defer fh.Close() //TODO: Learn how to handle errors on defer
+	defer func() {
+		err := fh.Close()
+		eHandler(err, "Could not close file")
+	}()
 
 	for _, urlStatus := range collection.getPaths() {
 		_, err := fh.WriteString(fmt.Sprintf("%v   -   %s\n", urlStatus.StatusCode, urlStatus.url))
